@@ -1,0 +1,15 @@
+# Cloudflare Pages 配置文件
+name = "image-prompt-tool"
+compatibility_date = "2024-01-01"
+
+# 环境变量配置（在 Cloudflare Dashboard 中设置）
+# [vars]
+# AI_PROVIDER = "openai"  # 可选: openai, claude, coze, doubao
+
+# 需要在 Cloudflare Dashboard -> Pages -> Settings -> Environment variables 中配置:
+# - AI_PROVIDER: 选择使用的AI提供商
+# - OPENAI_API_KEY: OpenAI API密钥 (如果使用OpenAI)
+# - CLAUDE_API_KEY: Claude API密钥 (如果使用Claude)
+# - COZE_API_KEY: 扣子API密钥 (如果使用扣子)
+# - COZE_WORKFLOW_ID: 扣子工作流ID (如果使用扣子)
+# - DOUBAO_API_KEY: 豆包API密钥 (如果使用豆包)
