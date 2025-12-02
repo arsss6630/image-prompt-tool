@@ -151,8 +151,8 @@ async function callOpenAI(env, imageBase64, modelType) {
 
     // 支持自定义 API 地址（中转API）
     const baseUrl = env.OPENAI_BASE_URL || 'https://api.openai.com';
-    // 支持自定义模型
-    const modelName = env.OPENAI_MODEL || 'gpt-4o-mini';
+    // 支持自定义模型（需要支持视觉的模型）
+    const modelName = env.OPENAI_MODEL || 'gpt-4o';
 
     const promptTemplate = getPromptTemplate(modelType);
 
