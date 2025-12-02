@@ -141,7 +141,7 @@ async function generatePrompt(env, imageBase64, modelType) {
 }
 
 /**
- * 调用 OpenAI GPT-4 Vision API
+ * 调用 OpenAI GPT-4 Vision API (支持中转API)
  */
 async function callOpenAI(env, imageBase64, modelType) {
     const apiKey = env.OPENAI_API_KEY;
@@ -149,16 +149,21 @@ async function callOpenAI(env, imageBase64, modelType) {
         throw new Error('OpenAI API Key 未配置');
     }
 
+    // 支持自定义 API 地址（中转API）
+    const baseUrl = env.OPENAI_BASE_URL || 'https://api.openai.com';
+    // 支持自定义模型
+    const modelName = env.OPENAI_MODEL || 'gpt-4o-mini';
+
     const promptTemplate = getPromptTemplate(modelType);
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            model: 'gpt-4o',
+            model: modelName,
             messages: [
                 {
                     role: 'system',
