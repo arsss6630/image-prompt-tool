@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI图片提示词反推 - 从图片生成Midjourney/Stable Diffusion提示词</title>
-    <meta name="description" content="免费AI图片提示词反推工具，上传图片自动生成Midjourney、Stable Diffusion、Flux等AI绘画提示词，支持中英文输出。">
-    <meta name="keywords" content="AI提示词,图片反推,Midjourney提示词,Stable Diffusion提示词,Flux提示词,AI绘画,prompt生成">
+    <title>AI Image to Prompt - Generate Midjourney/Stable Diffusion Prompts from Images</title>
+    <meta name="description" content="Free AI image to prompt tool. Upload any image and automatically generate professional prompts for Midjourney, Stable Diffusion, and Flux.">
+    <meta name="keywords" content="AI prompt, image to prompt, Midjourney prompt, Stable Diffusion prompt, Flux prompt, AI art, prompt generator">
     <link rel="canonical" href="https://imageprompt.tools">
-    <meta property="og:title" content="AI图片提示词反推 - 智能生成AI绘画提示词">
-    <meta property="og:description" content="上传任意图片，AI自动分析并生成适用于Midjourney、Stable Diffusion、Flux的专业提示词">
+    <meta property="og:title" content="AI Image to Prompt - Generate AI Art Prompts from Images">
+    <meta property="og:description" content="Upload any image and AI will analyze it to generate professional prompts for Midjourney, Stable Diffusion, and Flux.">
     <meta property="og:type" content="website">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,6 +38,7 @@
             background: var(--gradient);
             padding: 40px 20px;
             text-align: center;
+            position: relative;
         }
 
         header h1 {
@@ -49,6 +50,38 @@
         header p {
             font-size: 1.1rem;
             opacity: 0.95;
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            background: rgba(255,255,255,0.15);
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .lang-btn.active {
+            background: rgba(255,255,255,0.25);
+            font-weight: 600;
         }
 
         /* Main Container */
@@ -364,6 +397,12 @@
                 font-size: 1.8rem;
             }
 
+            .lang-switcher {
+                position: static;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
             .model-tabs {
                 justify-content: center;
             }
@@ -377,97 +416,233 @@
 </head>
 <body>
     <header>
-        <h1>AI图片提示词反推</h1>
-        <p>上传图片，智能生成 Midjourney / Stable Diffusion / Flux 提示词</p>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="zh">中文</button>
+        </div>
+        <h1 id="title">AI Image to Prompt</h1>
+        <p id="subtitle">Upload an image to generate Midjourney / Stable Diffusion / Flux prompts</p>
     </header>
 
     <div class="container">
         <section class="upload-section">
             <div class="upload-area" id="uploadArea">
                 <div class="upload-icon">📷</div>
-                <h3>点击或拖拽上传图片</h3>
-                <p>支持 JPG、PNG、WebP 格式，最大 10MB</p>
+                <h3 id="uploadTitle">Click or drag to upload image</h3>
+                <p id="uploadDesc">Supports JPG, PNG, WebP formats, max 10MB</p>
             </div>
             <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
 
             <div class="preview-container" id="previewContainer">
-                <img id="previewImage" class="preview-image" alt="预览图片">
+                <img id="previewImage" class="preview-image" alt="Preview">
             </div>
 
             <div class="model-section">
-                <h4>选择输出格式</h4>
+                <h4 id="formatLabel">Select Output Format</h4>
                 <div class="model-tabs">
                     <div class="model-tab active" data-model="midjourney">Midjourney</div>
                     <div class="model-tab" data-model="stable-diffusion">Stable Diffusion</div>
                     <div class="model-tab" data-model="flux">Flux</div>
-                    <div class="model-tab" data-model="all">全部格式</div>
+                    <div class="model-tab" data-model="all" id="allFormatsTab">All Formats</div>
                 </div>
             </div>
 
-            <button class="generate-btn" id="generateBtn" disabled>生成提示词</button>
+            <button class="generate-btn" id="generateBtn" disabled>Generate Prompt</button>
         </section>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>AI正在分析图片，请稍候...</p>
+            <p id="loadingText">AI is analyzing the image, please wait...</p>
         </div>
 
         <section class="results-section" id="resultsSection">
-            <h3>✨ 生成结果</h3>
+            <h3 id="resultsTitle">✨ Results</h3>
             <div id="resultsContent"></div>
         </section>
 
         <div class="features">
             <div class="feature">
-                <h3>🎨 多模型支持</h3>
-                <p>支持Midjourney、Stable Diffusion、Flux等主流AI绘画模型的提示词格式</p>
+                <h3>🎨 <span data-i18n="feature1Title">Multi-Model Support</span></h3>
+                <p data-i18n="feature1Desc">Supports prompt formats for Midjourney, Stable Diffusion, Flux and other popular AI art models</p>
             </div>
             <div class="feature">
-                <h3>🌐 中英双语</h3>
-                <p>自动生成中英文双语提示词，方便不同平台使用</p>
+                <h3>🌐 <span data-i18n="feature2Title">Bilingual Output</span></h3>
+                <p data-i18n="feature2Desc">Automatically generates prompts optimized for different platforms</p>
             </div>
             <div class="feature">
-                <h3>⚡ 极速生成</h3>
-                <p>基于先进多模态AI模型，秒级返回专业提示词</p>
+                <h3>⚡ <span data-i18n="feature3Title">Fast Generation</span></h3>
+                <p data-i18n="feature3Desc">Powered by advanced multimodal AI, returns professional prompts in seconds</p>
             </div>
             <div class="feature">
-                <h3>🔒 隐私安全</h3>
-                <p>图片仅用于分析，不会被存储或用于其他用途</p>
+                <h3>🔒 <span data-i18n="feature4Title">Privacy Safe</span></h3>
+                <p data-i18n="feature4Desc">Images are only used for analysis and are not stored or used for other purposes</p>
             </div>
         </div>
 
         <div class="how-it-works">
-            <h2>如何使用</h2>
+            <h2 id="howToUseTitle">How to Use</h2>
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
-                    <h4>上传图片</h4>
-                    <p>选择或拖拽任意图片到上传区域</p>
+                    <h4 data-i18n="step1Title">Upload Image</h4>
+                    <p data-i18n="step1Desc">Select or drag any image to the upload area</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <h4>选择格式</h4>
-                    <p>选择需要的AI绘画模型格式</p>
+                    <h4 data-i18n="step2Title">Select Format</h4>
+                    <p data-i18n="step2Desc">Choose the AI art model format you need</p>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <h4>生成提示词</h4>
-                    <p>点击按钮，AI自动分析生成</p>
+                    <h4 data-i18n="step3Title">Generate Prompt</h4>
+                    <p data-i18n="step3Desc">Click the button, AI analyzes and generates</p>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <h4>复制使用</h4>
-                    <p>一键复制到你的AI绘画工具</p>
+                    <h4 data-i18n="step4Title">Copy & Use</h4>
+                    <p data-i18n="step4Desc">One-click copy to your AI art tool</p>
                 </div>
             </div>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2025 AI图片提示词反推工具 | 免费在线使用</p>
+        <p id="footerText">&copy; 2025 AI Image to Prompt Tool | Free Online Tool</p>
     </footer>
 
     <script>
+        // i18n translations
+        const translations = {
+            en: {
+                title: 'AI Image to Prompt',
+                subtitle: 'Upload an image to generate Midjourney / Stable Diffusion / Flux prompts',
+                uploadTitle: 'Click or drag to upload image',
+                uploadDesc: 'Supports JPG, PNG, WebP formats, max 10MB',
+                formatLabel: 'Select Output Format',
+                allFormatsTab: 'All Formats',
+                generateBtn: 'Generate Prompt',
+                loadingText: 'AI is analyzing the image, please wait...',
+                resultsTitle: '✨ Results',
+                feature1Title: 'Multi-Model Support',
+                feature1Desc: 'Supports prompt formats for Midjourney, Stable Diffusion, Flux and other popular AI art models',
+                feature2Title: 'Bilingual Output',
+                feature2Desc: 'Automatically generates prompts optimized for different platforms',
+                feature3Title: 'Fast Generation',
+                feature3Desc: 'Powered by advanced multimodal AI, returns professional prompts in seconds',
+                feature4Title: 'Privacy Safe',
+                feature4Desc: 'Images are only used for analysis and are not stored or used for other purposes',
+                howToUseTitle: 'How to Use',
+                step1Title: 'Upload Image',
+                step1Desc: 'Select or drag any image to the upload area',
+                step2Title: 'Select Format',
+                step2Desc: 'Choose the AI art model format you need',
+                step3Title: 'Generate Prompt',
+                step3Desc: 'Click the button, AI analyzes and generates',
+                step4Title: 'Copy & Use',
+                step4Desc: 'One-click copy to your AI art tool',
+                footerText: '© 2025 AI Image to Prompt Tool | Free Online Tool',
+                copyBtn: 'Copy Prompt',
+                copied: 'Copied!',
+                alertInvalidType: 'Please upload JPG, PNG or WebP format images',
+                alertTooLarge: 'Image size cannot exceed 10MB',
+                alertError: 'Generation failed, please try again: ',
+                alertCopyFailed: 'Copy failed, please copy manually',
+                modelNames: {
+                    'midjourney': 'Midjourney Prompt',
+                    'stable-diffusion': 'Stable Diffusion Prompt',
+                    'flux': 'Flux Prompt'
+                }
+            },
+            zh: {
+                title: 'AI图片提示词反推',
+                subtitle: '上传图片，智能生成 Midjourney / Stable Diffusion / Flux 提示词',
+                uploadTitle: '点击或拖拽上传图片',
+                uploadDesc: '支持 JPG、PNG、WebP 格式，最大 10MB',
+                formatLabel: '选择输出格式',
+                allFormatsTab: '全部格式',
+                generateBtn: '生成提示词',
+                loadingText: 'AI正在分析图片，请稍候...',
+                resultsTitle: '✨ 生成结果',
+                feature1Title: '多模型支持',
+                feature1Desc: '支持Midjourney、Stable Diffusion、Flux等主流AI绘画模型的提示词格式',
+                feature2Title: '中英双语',
+                feature2Desc: '自动生成中英文双语提示词，方便不同平台使用',
+                feature3Title: '极速生成',
+                feature3Desc: '基于先进多模态AI模型，秒级返回专业提示词',
+                feature4Title: '隐私安全',
+                feature4Desc: '图片仅用于分析，不会被存储或用于其他用途',
+                howToUseTitle: '如何使用',
+                step1Title: '上传图片',
+                step1Desc: '选择或拖拽任意图片到上传区域',
+                step2Title: '选择格式',
+                step2Desc: '选择需要的AI绘画模型格式',
+                step3Title: '生成提示词',
+                step3Desc: '点击按钮，AI自动分析生成',
+                step4Title: '复制使用',
+                step4Desc: '一键复制到你的AI绘画工具',
+                footerText: '© 2025 AI图片提示词反推工具 | 免费在线使用',
+                copyBtn: '复制提示词',
+                copied: '已复制!',
+                alertInvalidType: '请上传 JPG、PNG 或 WebP 格式的图片',
+                alertTooLarge: '图片大小不能超过 10MB',
+                alertError: '生成失败，请稍后重试：',
+                alertCopyFailed: '复制失败，请手动复制',
+                modelNames: {
+                    'midjourney': 'Midjourney 提示词',
+                    'stable-diffusion': 'Stable Diffusion 提示词',
+                    'flux': 'Flux 提示词'
+                }
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'en';
+
+        // Apply translations
+        function applyTranslations(lang) {
+            const t = translations[lang];
+
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('uploadTitle').textContent = t.uploadTitle;
+            document.getElementById('uploadDesc').textContent = t.uploadDesc;
+            document.getElementById('formatLabel').textContent = t.formatLabel;
+            document.getElementById('allFormatsTab').textContent = t.allFormatsTab;
+            document.getElementById('generateBtn').textContent = t.generateBtn;
+            document.getElementById('loadingText').textContent = t.loadingText;
+            document.getElementById('resultsTitle').textContent = t.resultsTitle;
+            document.getElementById('howToUseTitle').textContent = t.howToUseTitle;
+            document.getElementById('footerText').textContent = t.footerText;
+
+            // Update elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+
+            // Update HTML lang attribute
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+            // Update active lang button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+        }
+
+        // Language switcher
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                applyTranslations(btn.dataset.lang);
+            });
+        });
+
+        // Initialize language
+        applyTranslations(currentLang);
+
         // Elements
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -511,16 +686,18 @@
 
         // Handle File
         function handleFile(file) {
+            const t = translations[currentLang];
+
             // Validate file type
             const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
             if (!validTypes.includes(file.type)) {
-                alert('请上传 JPG、PNG 或 WebP 格式的图片');
+                alert(t.alertInvalidType);
                 return;
             }
 
             // Validate file size (10MB)
             if (file.size > 10 * 1024 * 1024) {
-                alert('图片大小不能超过 10MB');
+                alert(t.alertTooLarge);
                 return;
             }
 
@@ -549,6 +726,8 @@
         generateBtn.addEventListener('click', async () => {
             if (!selectedFile) return;
 
+            const t = translations[currentLang];
+
             // Show loading
             loading.classList.add('active');
             resultsSection.classList.remove('active');
@@ -571,7 +750,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('API请求失败');
+                    throw new Error('API request failed');
                 }
 
                 const data = await response.json();
@@ -579,7 +758,7 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('生成失败，请稍后重试：' + error.message);
+                alert(t.alertError + error.message);
             } finally {
                 loading.classList.remove('active');
                 generateBtn.disabled = false;
@@ -598,6 +777,7 @@
 
         // Display Results
         function displayResults(data) {
+            const t = translations[currentLang];
             resultsContent.innerHTML = '';
 
             const prompts = data.prompts || {};
@@ -606,16 +786,10 @@
                 const box = document.createElement('div');
                 box.className = 'result-box';
 
-                const modelNames = {
-                    'midjourney': 'Midjourney 提示词',
-                    'stable-diffusion': 'Stable Diffusion 提示词',
-                    'flux': 'Flux 提示词'
-                };
-
                 box.innerHTML = `
-                    <h4>${modelNames[model] || model}</h4>
+                    <h4>${t.modelNames[model] || model}</h4>
                     <div class="result-text">${prompt}</div>
-                    <button class="copy-btn" onclick="copyToClipboard(this, '${encodeURIComponent(prompt)}')">复制提示词</button>
+                    <button class="copy-btn" onclick="copyToClipboard(this, '${encodeURIComponent(prompt)}')">${t.copyBtn}</button>
                 `;
 
                 resultsContent.appendChild(box);
@@ -627,17 +801,18 @@
 
         // Copy to Clipboard
         function copyToClipboard(btn, encodedText) {
+            const t = translations[currentLang];
             const text = decodeURIComponent(encodedText);
             navigator.clipboard.writeText(text).then(() => {
-                btn.textContent = '已复制!';
+                btn.textContent = t.copied;
                 btn.classList.add('copied');
                 setTimeout(() => {
-                    btn.textContent = '复制提示词';
+                    btn.textContent = t.copyBtn;
                     btn.classList.remove('copied');
                 }, 2000);
             }).catch(err => {
                 console.error('Copy failed:', err);
-                alert('复制失败，请手动复制');
+                alert(t.alertCopyFailed);
             });
         }
     </script>
