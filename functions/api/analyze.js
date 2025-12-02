@@ -20,45 +20,51 @@ const PROMPT_TEMPLATES = {
 5. 构图：视角、景深、构图方式
 6. 细节：服装、表情、纹理等细节特征`,
 
-    midjourney: `请为这张图片生成Midjourney格式的提示词。
+    midjourney: `请为这张图片生成Midjourney格式的提示词，同时提供英文和中文版本。
 
 要求：
-- 使用英文
 - 包含主体描述、场景、风格、光影等元素
-- 在末尾添加适当的参数，如 --ar 16:9, --v 6, --style raw 等
+- 在英文版末尾添加适当的参数，如 --ar 16:9, --v 6, --style raw 等
 - 使用逗号分隔不同的描述元素
-- 提示词应该简洁但完整，通常在50-150个单词之间
+- 提示词应该简洁但完整
 
-示例格式：
-a beautiful woman with long black hair, standing in a cherry blossom garden, soft pink petals falling, golden hour lighting, cinematic composition, detailed face, elegant dress, photorealistic style, 8k quality --ar 16:9 --v 6`,
+请严格按以下格式输出：
+【English】
+[英文提示词，包含参数]
 
-    stableDiffusion: `请为这张图片生成Stable Diffusion格式的提示词。
+【中文】
+[中文提示词翻译，不含参数]`,
+
+    stableDiffusion: `请为这张图片生成Stable Diffusion格式的提示词，同时提供英文和中文版本。
 
 要求：
-- 使用英文
 - 分为正向提示词(Positive)和负向提示词(Negative)
 - 正向提示词包含：主体、场景、风格、质量标签(如masterpiece, best quality, 8k)
 - 负向提示词包含常见的质量排除词
 - 使用逗号分隔
 
-输出格式：
-Positive: [正向提示词]
-Negative: [负向提示词]
+请严格按以下格式输出：
+【English】
+Positive: [英文正向提示词]
+Negative: [英文负向提示词]
 
-示例：
-Positive: masterpiece, best quality, 1girl, long black hair, cherry blossom garden, pink petals, golden hour, soft lighting, detailed face, elegant dress, photorealistic, 8k uhd
-Negative: lowres, bad anatomy, bad hands, text, error, missing fingers, cropped, worst quality, low quality, jpeg artifacts, ugly, duplicate, blurry`,
+【中文】
+正向: [中文正向提示词翻译]
+负向: [中文负向提示词翻译]`,
 
-    flux: `请为这张图片生成Flux格式的提示词。
+    flux: `请为这张图片生成Flux格式的提示词，同时提供英文和中文版本。
 
 要求：
 - 使用自然语言描述，可以是较长的句子
 - Flux模型更擅长理解自然语言，所以描述可以更加详细和连贯
 - 包含主体、环境、风格、氛围等元素
-- 使用英文
 
-示例：
-A stunning portrait of a young woman with flowing black hair standing gracefully in a traditional Japanese garden. Cherry blossom petals drift gently through the air around her. The scene is bathed in warm golden hour sunlight, creating a dreamy and romantic atmosphere. She wears an elegant silk dress that catches the light beautifully. The image has a cinematic quality with professional photography composition and exceptional detail.`
+请严格按以下格式输出：
+【English】
+[英文自然语言描述]
+
+【中文】
+[中文自然语言描述]`
 };
 
 export async function onRequestPost(context) {
